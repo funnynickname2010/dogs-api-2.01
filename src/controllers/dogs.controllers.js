@@ -79,13 +79,22 @@ export function likePost(req, res) {
         // Found the post
         if (post) {
             post.likes++;
-            res.status(200).json(post); // OK
+            res.status(200).json({
+                success: true,
+                data: post
+            }); // OK
         }
         else { // Haven't found the post
-            res.status(404).json( { message: "No such dog file found." });
+            res.status(404).json({
+                success: false,
+                message: "No such dog file found." 
+            });
         }
     }
     else { // Haven't found the database, 204 - No content
-        res.status(204).json( { message: "No database, please search for all dogs first."});
+        res.status(204).json( { 
+            success: false,
+            message: "No database, please search for all dogs first."
+        });
     }
 }
