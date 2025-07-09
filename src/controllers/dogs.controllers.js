@@ -6,33 +6,33 @@ function isaVideo(mystring) {
 }
 
 // Get all the posts' URLs and assign like value to them, parse their type
-// GET /posts
-async function getAllPosts(req, res) {
-    
-    // In case something breaks in the process of fetching
-    try {
-        const response = await axios.get("http://random.dog/doggos");
-        // The site sends back the names of the pictures
-        let filesArray = response.data;
+export async function fetchPosts() {
+    const response = await axios.get("http://random.dog/doggos");
+    let filesArray = response.data;
 
-        // Creating an array of json objects, posts, in memory
-        global.posts = filesArray.map(file => ({
-            file,
-            url: `http://random.dog/${file}`,
-            likes: 0,
-            type: isaVideo(file)
-        }))
-    }
-    catch (err) {
-        console.log("Error 'getAllPosts': ", err);
-        return res.status(500) // Internal server error status code
-    }
-
-    res.json(posts);
+    global.posts = filesArray.map(file => ({
+        file,
+        url: `http://random.dog/${file}`,
+        likes: 0,
+        type: isaVideo(file)
+    }));
 }
 
-// GET /posts/:filename
-function getPost(req, res) {
+// GET /
+export async function getAllPosts(req, res) {
+    try {
+        if (!global.posts) {
+            await fetchPosts();
+        }
+        res.json(global.posts);
+    } catch (err) {
+        console.log("Error 'getAllPosts':", err);
+        res.status(500).json({ message: "Internal server error." });
+    }
+}
+
+// GET /post/:filename
+export function getPost(req, res) {
     // The result variable is needed in order not to create multiple return statements
     let result = null;
     let statusCode = null;
@@ -40,7 +40,7 @@ function getPost(req, res) {
     // If the getAllPosts was invoked at least once
     if (posts) {
         // Searching for the post in our "database"
-        const post = posts.find(p => p == req.params.filename);
+        const post = posts.find(p => p.file === req.params.filename);
 
         // Check whether we found the post
         if (!post) {
@@ -63,11 +63,11 @@ function getPost(req, res) {
 }
 
 // POST /:filename
-function likePost(req, res) {
+export function likePost(req, res) {
 
     // If we have the database up
     if (posts) {
-        const post = posts.find(p => p == req.params.filename);
+        const post = posts.find(p => p.file == req.params.filename);
 
         // Found the post
         if (post) {
@@ -81,12 +81,4 @@ function likePost(req, res) {
     else { // Haven't found the database, 204 - No content
         res.status(204).json( { message: "No database, please search for all dogs first."});
     }
-}
-
-
-// ES export syntax
-export {
-    getAllPosts,
-    likePost,
-    getPost
 }

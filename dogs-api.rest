@@ -1,8 +1,8 @@
 ### Get all posts
-GET http://localhost:3000/posts
+GET http://localhost:3000/
 
 ### Get one post
-GET http://localhost:3000/<filename>
+GET http://localhost:3000/posts/00564ba3-e5cb-4b2b-8d97-c65a9ef26c23.png
 
 ### Like a post
-POST http://localhost:3000/likes/<filename>
+POST http://localhost:3000/like/00564ba3-e5cb-4b2b-8d97-c65a9ef26c23.png

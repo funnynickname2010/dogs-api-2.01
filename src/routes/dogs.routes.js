@@ -8,8 +8,8 @@ import { likePost } from "../controllers/dogs.controllers.js"
 const dogsRouter = express.Router();
 
 dogsRouter.get("/posts/:filename", getPost);
-dogsRouter.get("/posts", getAllPosts);
-dogsRouter.post("/likes/:filename", likePost);
+dogsRouter.get("/", getAllPosts);
+dogsRouter.post("/like/:filename", likePost);
 
 
 export default dogsRouter;
