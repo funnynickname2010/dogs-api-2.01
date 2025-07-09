@@ -1,9 +1,6 @@
 // ES import syntax
 import axios from "axios"
-
-function isaVideo(mystring) {
-    return mystring.endsWith(".mp4") || mystring.endsWith(".webm");
-}
+import { isaVideo } from "../utils/dogs.utils.js"
 
 // Get all the posts' URLs and assign like value to them, parse their type
 export async function fetchPosts() {
@@ -21,21 +18,25 @@ export async function fetchPosts() {
 // GET /
 export async function getAllPosts(req, res) {
     try {
+
         if (!global.posts) {
             await fetchPosts();
         }
-        res.json(global.posts);
+
+        // 200 - OK
+        res.status(200).json(global.posts);
+
     } catch (err) {
         console.log("Error 'getAllPosts':", err);
-        res.status(500).json({ message: "Internal server error." });
+        res.status(500).json({ 
+            success: false,
+            message: "Internal server error." 
+        });
     }
 }
 
 // GET /post/:filename
 export function getPost(req, res) {
-    // The result variable is needed in order not to create multiple return statements
-    let result = null;
-    let statusCode = null;
 
     // If the getAllPosts was invoked at least once
     if (posts) {
@@ -45,21 +46,27 @@ export function getPost(req, res) {
         // Check whether we found the post
         if (!post) {
             // No post with such a name found
-            statusCode = 404; // 404 - Not found
-            result = { message: "No such dog file found." };
+            res.status(404).json({
+                success: false,
+                message: "No such dog file found."
+            })
         } // If we found the searched post
         else {
-            result = post; // Send the requested json file
-            statusCode = 200; // 200 - OK
+            // Send the requested json file
+            res.status(200).json({
+                success: true,
+                data: post
+            });
         }
 
     }
     else {
-        statusCode = 204; // 204 - No content
-        result = { message: "Please search for all the posts first."};
+        // 204 - No content
+        res.status(204).json({
+            success: false,
+            message: "Please search for all the posts first."
+        })
     }
-
-    res.status(statusCode).json(result);
 }
 
 // POST /:filename
